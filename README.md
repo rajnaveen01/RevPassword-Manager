@@ -53,7 +53,7 @@ The system uses a relational schema with **One-to-Many** relationships:
 
 1.  **Clone the Repository:**
     ```bash
-    git clone [https://github.com/YourUsername/RevPasswordManager.git](https://github.com/rajnaveen01/RevPassword-Manager)
+    git clone (https://github.com/rajnaveen01/RevPassword-Manager)
     ```
 2.  **Configure Database:**
     * Ensure Oracle Database is running.

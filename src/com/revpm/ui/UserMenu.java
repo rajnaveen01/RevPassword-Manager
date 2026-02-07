@@ -7,9 +7,9 @@ import com.revpm.util.InputUtil;
 public class UserMenu {
 
     private int userId;
-    private String userEmail; // Store email for session
+    private String userEmail;
     private UserService userService = new UserService();
-    private VerificationService verificationService = new VerificationService(); // Add Service
+    private VerificationService verificationService = new VerificationService();
 
     public UserMenu(int userId, String userEmail) {
         this.userId = userId;
@@ -18,82 +18,75 @@ public class UserMenu {
 
     public void start() {
         while (true) {
-            System.out.println("\n--- USER MENU (" + userEmail + ") ---");
-            System.out.println("1. Manage Passwords");
-            System.out.println("2. Update Profile");
-            System.out.println("3. Security Questions");
-            System.out.println("4. Change Master Password");
-            System.out.println("0. Logout");
+            System.out.println("\n================= USER DASHBOARD =====================");
+            System.out.println("   User: " + userEmail);
+            System.out.println("------------------------------------------------------");
+            System.out.println("   1. Manage Password Vault");
+            System.out.println("   2. Update Profile Details");
+            System.out.println("   3. Manage Security Questions");
+            System.out.println("   4. Change Master Password");
+            System.out.println("   0. Logout");
+            System.out.println("======================================================");
             
-            int choice = InputUtil.nextInt("Choose option: ");
+            int choice = InputUtil.nextInt(">> Select Action: ");
 
             switch (choice) {
-            case 1:
-                new PasswordMenu(userId, userEmail).start(); // Pass email
-                break;
-            case 2:
-                updateProfile();
-                break;
-            case 3:
-                new SecurityMenu(userId).start();
-                break;
-            case 4:
-                changeMasterPassword();
-                break;
-            case 0:
-                System.out.println("Logged out!");
-                return;
-            default:
-                System.out.println("Invalid choice!");
+                case 1: new PasswordMenu(userId, userEmail).start(); break;
+                case 2: updateProfile(); break;
+                case 3: new SecurityMenu(userId).start(); break;
+                case 4: changeMasterPassword(); break;
+                case 0:
+                    System.out.println("\n>> [INFO] Logging out securely...");
+                    return;
+                default: System.out.println(">> [ERROR] Invalid choice.");
             }
         }
     }
 
     private void updateProfile() {
-        System.out.println("\n--- SENSITIVE OPERATION: UPDATE PROFILE ---");
+        System.out.println("\n-------------- SENSITIVE OPERATION ---------------");
+        System.out.println(">> Initiating Profile Update Protocol...");
         
-        // 1. Verify Identity
         String code = verificationService.generateCode(userId);
-        System.out.println("[SYSTEM MOCK] Verification Code sent to email: " + code);
+        System.out.println(">> [MOCK EMAIL] Verification Code: " + code);
 
-        String inputCode = InputUtil.nextLine("Enter Verification Code: ");
+        String inputCode = InputUtil.nextLine(">> Enter 6-Digit Code: ");
         if (!verificationService.validateCode(userId, inputCode)) {
-            System.out.println("Verification Failed!");
+            System.out.println(">> [ERROR] Verification Failed. Access Denied.");
             return;
         }
 
-        // 2. Get Data
-        String name = InputUtil.nextLine("New Name: ");
-        
-        // VALIDATION: Check email format
+        String name = InputUtil.nextLine(">> Enter New Name: ");
         String email;
         while (true) {
-            email = InputUtil.nextLine("New Email: ");
+            email = InputUtil.nextLine(">> Enter New Email: ");
             if (com.revpm.util.ValidationUtil.isValidEmail(email)) break;
-            System.out.println("Invalid email format.");
+            System.out.println(">> [ERROR] Invalid email format.");
         }
         
-        boolean success = userService.updateProfile(userId, name, email);
-        if (success) {
-            System.out.println("Profile updated! Please re-login.");
+        if (userService.updateProfile(userId, name, email)) {
+            System.out.println(">> [SUCCESS] Profile updated!!");
             this.userEmail = email; 
         } else {
-            System.out.println("Update failed!");
+            System.out.println(">> [ERROR] Update failed. Email might differ.");
         }
     }
 
     private void changeMasterPassword() {
-        String oldPass = InputUtil.nextLine("Old Password: ");
+        System.out.println("\n------------- CHANGE MASTER PASSWORD -------------");
+        String oldPass = InputUtil.nextLine(">> Enter Current Password: ");
         
-        // VALIDATION: Check password strength
         String newPass;
         while (true) {
-            newPass = InputUtil.nextLine("New Password: ");
+            newPass = InputUtil.nextLine(">> Enter New Password: ");
             if (com.revpm.util.ValidationUtil.isStrongPassword(newPass)) break;
-            System.out.println("Error: Password is too weak (needs 8+ chars, Upper, Lower, Digit, Special).");
+            System.out.println(">> [ERROR] Password too weak.");
         }
 
-        boolean success = userService.changePassword(userId, oldPass, newPass);
-        System.out.println(success ? "Password changed!" : "Failed (Old password incorrect).");
+        if (userService.changePassword(userId, oldPass, newPass)) {
+            System.out.println(">> [SUCCESS] Master Password changed successfully.");
+        } else {
+            System.out.println(">> [ERROR] Current password verification failed.");
+        }
     }
 }

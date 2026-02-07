@@ -13,7 +13,6 @@ public class InputUtil {
         return scanner.nextLine();
     }
 
-    // FIXED: Added error handling for non-integer inputs
     public static int nextInt(String message) {
         while (true) {
             try {
@@ -25,7 +24,6 @@ public class InputUtil {
         }
     }
 
-    // FIXED: Added error handling for non-long inputs
     public static long nextLong(String message) {
         while (true) {
             try {

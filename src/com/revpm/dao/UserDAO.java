@@ -40,7 +40,7 @@ public class UserDAO {
              PreparedStatement ps = con.prepareStatement(sql)) {
             ps.setLong(1, userId);
             ResultSet rs = ps.executeQuery();
-            if (rs.next()) return Optional.of(mapUser(rs)); // FIXED: Use consistent mapping
+            if (rs.next()) return Optional.of(mapUser(rs)); 
         } catch (SQLException e) {
             e.printStackTrace();
         }
@@ -77,7 +77,7 @@ public class UserDAO {
     private User mapUser(ResultSet rs) throws SQLException {
         User user = new User();
         user.setUserId(rs.getLong("user_id"));
-        user.setUsername(rs.getString("username")); // FIXED: Matches DB column
+        user.setUsername(rs.getString("username")); 
         user.setEmail(rs.getString("email"));
         user.setMasterPassword(rs.getString("master_password"));
         user.setCreatedAt(rs.getDate("created_at"));

@@ -16,57 +16,63 @@ public class SecurityMenu {
 
     public void start() {
         while (true) {
-            System.out.println("\n--- SECURITY MENU ---");
-            System.out.println("1. Add Question");
-            System.out.println("2. List Questions");
-            System.out.println("3. Delete Question");
-            System.out.println("0. Back");
+            System.out.println("\n================ SECURITY SETTINGS ===================");
+            System.out.println("   1. Add New Security Question");
+            System.out.println("   2. View Active Questions");
+            System.out.println("   3. Delete Question");
+            System.out.println("   0. Return to Dashboard");
+            System.out.println("======================================================");
 
-            int choice = InputUtil.nextInt("Choose option: ");
+            int choice = InputUtil.nextInt(">> Select Option: ");
 
             switch (choice) {
                 case 1: addQuestion(); break;
                 case 2: listQuestions(); break;
                 case 3: deleteQuestion(); break;
                 case 0: return;
-                default: System.out.println("Invalid choice!");
+                default: System.out.println(">> [ERROR] Invalid choice.");
             }
         }
     }
 
     private void addQuestion() {
-        System.out.println("\n--- ADD SECURITY QUESTION ---");
-        
+        System.out.println("\n-- Setup Recovery Question --");
         String question;
         while(true) {
-            question = InputUtil.nextLine("Question: ");
+            question = InputUtil.nextLine(">> Question: ");
             if (!question.trim().isEmpty()) break;
-            System.out.println("Error: Question cannot be empty!");
+            System.out.println(">> [ERROR] Question text required.");
         }
 
         String answer;
         while(true) {
-            answer = InputUtil.nextLine("Answer: ");
+            answer = InputUtil.nextLine(">> Answer: ");
             if (!answer.trim().isEmpty()) break;
-            System.out.println("Error: Answer cannot be empty!");
+            System.out.println(">> [ERROR] Answer text required.");
         }
 
-        boolean success = securityService.addQuestion(userId, question, answer);
-        System.out.println(success ? "Added!" : "Failed!");
+        if (securityService.addQuestion(userId, question, answer)) {
+            System.out.println(">> [SUCCESS] Security question added.");
+        } else {
+            System.out.println(">> [ERROR] Failed. Question might differ.");
+        }
     }
 
     private void listQuestions() {
         List<SecurityQuestion> list = securityService.getQuestions(userId);
-        System.out.printf("%-5s | %-30s%n", "ID", "Question");
-        System.out.println("-------------------------------------");
+        System.out.println("\n----------------- ACTIVE QUESTIONS -------------------");
         for (SecurityQuestion q : list) {
-            System.out.printf("%-5d | %-30s%n", q.getQuestionId(), q.getQuestion());
+            System.out.printf("   [ID: %d] %s%n", q.getQuestionId(), q.getQuestion());
         }
+        System.out.println("------------------------------------------------------");
     }
 
     private void deleteQuestion() {
-        long questionId = InputUtil.nextLong("Question ID: ");
-        boolean success = securityService.deleteQuestion(questionId);
-        System.out.println(success ? "Deleted!" : "Failed!");
+        long questionId = InputUtil.nextLong(">> Enter Question ID to Remove: ");
+        if (securityService.deleteQuestion(questionId)) {
+            System.out.println(">> [SUCCESS] Question removed.");
+        } else {
+            System.out.println(">> [ERROR] Removal failed. Invalid ID.");
+        }
     }
 }

@@ -7,25 +7,20 @@ public class SecurityQuestion {
     private String question;
     private String answer; 
 
-    // Default Constructor
     public SecurityQuestion() {}
 
-    // Constructor for Adding Security Question
     public SecurityQuestion(long userId, String question, String answer) {
         this.userId = userId;
         this.question = question;
         this.answer = answer;
     }
 
-    // Full Constructor
     public SecurityQuestion(long questionId, long userId, String question, String answer) {
         this.questionId = questionId;
         this.userId = userId;
         this.question = question;
         this.answer = answer;
     }
-
-    // Getters and Setters
 
     public long getQuestionId() {
         return questionId;

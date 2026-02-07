@@ -11,7 +11,7 @@ public class UserService {
 
     public boolean registerUser(String name, String email, String password) {
         if (userDAO.findByEmail(email).isPresent()) {
-            return false; // Email already exists
+            return false; 
         }
         String hashedPassword = EncryptionUtil.hashSHA256(password);
         User user = new User(name, email, hashedPassword);
@@ -26,7 +26,11 @@ public class UserService {
                 return (int) user.getUserId();
             }
         }
-        return -1; // Login failed
+        return -1; 
+    }
+
+    public boolean isEmailRegistered(String email) {
+        return userDAO.findByEmail(email).isPresent();
     }
 
     public boolean updateProfile(long userId, String name, String email) {
@@ -44,14 +48,12 @@ public class UserService {
         }
         return false;
     }
-    
-    // Helper for password recovery to get userId by email
+
     public Long getUserIdByEmail(String email) {
         Optional<User> u = userDAO.findByEmail(email);
         return u.map(User::getUserId).orElse(null);
     }
-    
-    // Direct password reset (used after security questions are verified)
+
     public boolean resetMasterPassword(long userId, String newPassword) {
         return userDAO.updateMasterPassword(userId, EncryptionUtil.hashSHA256(newPassword));
     }

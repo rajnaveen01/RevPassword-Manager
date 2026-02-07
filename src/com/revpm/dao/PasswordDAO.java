@@ -8,12 +8,30 @@ import java.util.List;
 
 public class PasswordDAO {
 
-	public boolean addPassword(PasswordEntry entry) {
-        String sql = "INSERT INTO PASSWORD_ENTRIES(entry_id, user_id, account_name, account_username, account_password) " +
+    public boolean addPassword(PasswordEntry entry) {
+    	
+        String checkSql = "SELECT entry_id FROM PASSWORD_ENTRIES WHERE user_id = ? AND account_name = ? AND is_deleted = 'Y'";
+        
+        try (Connection con = DBConnection.getConnection();
+             PreparedStatement psCheck = con.prepareStatement(checkSql)) {
+             
+            psCheck.setLong(1, entry.getUserId());
+            psCheck.setString(2, entry.getAccountName());
+            ResultSet rs = psCheck.executeQuery();
+
+            if (rs.next()) {
+                long existingId = rs.getLong("entry_id");
+                return reactivatePassword(existingId, entry);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        String insertSql = "INSERT INTO PASSWORD_ENTRIES(entry_id, user_id, account_name, account_username, account_password) " +
                      "VALUES(seq_entry_id.NEXTVAL, ?, ?, ?, ?)";
 
         try (Connection con = DBConnection.getConnection();
-             PreparedStatement ps = con.prepareStatement(sql)) {
+             PreparedStatement ps = con.prepareStatement(insertSql)) {
 
             ps.setLong(1, entry.getUserId());
             ps.setString(2, entry.getAccountName());
@@ -23,9 +41,8 @@ public class PasswordDAO {
             return ps.executeUpdate() > 0;
 
         } catch (SQLException e) {
-            // FIXED: Don't print stack trace for Unique Constraint violation (ORA-00001)
-            if (e.getErrorCode() == 1) { 
-                System.out.println("Error: An entry with this Account Name already exists (Check your list or deleted items).");
+            if (e.getErrorCode() == 1) { // Unique Constraint Violation
+                 System.out.println("Error: Account name already exists!");
             } else {
                 e.printStackTrace();
             }
@@ -33,10 +50,25 @@ public class PasswordDAO {
         return false;
     }
 
-    // FIXED: Check ALL rows (even deleted ones) to prevent Unique Constraint Crashes
+    private boolean reactivatePassword(long entryId, PasswordEntry newData) {
+        String sql = "UPDATE PASSWORD_ENTRIES SET account_username = ?, account_password = ?, is_deleted = 'N', updated_at = SYSDATE " +
+                     "WHERE entry_id = ?";
+        try (Connection con = DBConnection.getConnection();
+             PreparedStatement ps = con.prepareStatement(sql)) {
+             
+            ps.setString(1, newData.getAccountUsername());
+            ps.setString(2, newData.getAccountPassword());
+            ps.setLong(3, entryId);
+            return ps.executeUpdate() > 0;
+            
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
+
     public boolean isAccountNameExists(long userId, String accountName) {
         String sql = "SELECT COUNT(*) FROM PASSWORD_ENTRIES WHERE USER_ID = ? AND ACCOUNT_NAME = ?"; 
-        // Removed "AND is_deleted = 'N'" so we find deleted duplicates too
         
         try (Connection con = DBConnection.getConnection();
              PreparedStatement ps = con.prepareStatement(sql)) {
@@ -110,14 +142,13 @@ public class PasswordDAO {
 
     public List<PasswordEntry> searchPasswords(long userId, String keyword) {
         List<PasswordEntry> list = new ArrayList<>();
-        // FIXED: Added is_deleted check
         String sql = "SELECT * FROM PASSWORD_ENTRIES WHERE USER_ID=? AND ACCOUNT_NAME LIKE ? AND is_deleted = 'N'";
         try (Connection con = DBConnection.getConnection();
              PreparedStatement ps = con.prepareStatement(sql)) {
             ps.setLong(1, userId);
             ps.setString(2, "%" + keyword + "%");
             ResultSet rs = ps.executeQuery();
-            while (rs.next()) list.add(mapEntry(rs)); // FIXED: Used consistent map method
+            while (rs.next()) list.add(mapEntry(rs)); 
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -129,7 +160,6 @@ public class PasswordDAO {
         entry.setEntryId(rs.getLong("entry_id"));
         entry.setUserId(rs.getLong("user_id"));
         entry.setAccountName(rs.getString("account_name"));
-        // FIXED: Corrected column name to match INSERT statement
         entry.setAccountUsername(rs.getString("account_username")); 
         entry.setAccountPassword(rs.getString("account_password"));
         entry.setCreatedAt(rs.getDate("created_at"));

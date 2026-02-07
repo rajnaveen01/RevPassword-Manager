@@ -7,7 +7,6 @@ import java.sql.*;
 
 public class VerificationDAO {
 
-    // Save Verification Code
     public boolean saveCode(VerificationCode vc) {
         String sql = "INSERT INTO VERIFICATION_CODES(code_id, user_id, code, expiry_time, is_used) " +
                      "VALUES(seq_code_id.NEXTVAL, ?, ?, ?, 'N')";
@@ -27,7 +26,6 @@ public class VerificationDAO {
         return false;
     }
 
-    // Validate Verification Code
     public VerificationCode getValidCode(long userId, String code) {
         String sql = "SELECT * FROM VERIFICATION_CODES " +
                      "WHERE user_id = ? AND code = ? AND is_used = 'N'";
@@ -56,7 +54,6 @@ public class VerificationDAO {
         return null;
     }
 
-    // Mark Code as Used
     public void markCodeUsed(long codeId) {
         String sql = "UPDATE VERIFICATION_CODES SET is_used = 'Y' WHERE code_id = ?";
 

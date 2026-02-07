@@ -10,12 +10,10 @@ public class PasswordService {
 
     private final PasswordDAO passwordDAO = new PasswordDAO();
 
-    public boolean addPassword(long userId, String accountName, String username, String password) {
-        if (passwordDAO.isAccountNameExists(userId, accountName)) {
-            return false; 
-        }
+    public boolean addPassword(long userId, String accountName, String username, String password) {  
         String encryptedPassword = EncryptionUtil.encryptAES(password);
-        return passwordDAO.addPassword(new PasswordEntry(userId, accountName, username, encryptedPassword));
+        PasswordEntry entry = new PasswordEntry(userId, accountName, username, encryptedPassword);
+        return passwordDAO.addPassword(entry);
     }
 
     public List<PasswordEntry> listPasswords(long userId) {
@@ -42,12 +40,10 @@ public class PasswordService {
         return passwordDAO.searchPasswords(userId, keyword);
     }
 
-    // FIXED: Use the secure PasswordGenerator util
     public String generateStrongPassword(int length) {
         return PasswordGenerator.generate(length, true, true, true, true);
     }
-    
- // NEW: Custom generation based on user choices
+
     public String generateCustomPassword(int length, boolean upper, boolean lower, boolean digits, boolean special) {
         try {
             return PasswordGenerator.generate(length, upper, lower, digits, special);

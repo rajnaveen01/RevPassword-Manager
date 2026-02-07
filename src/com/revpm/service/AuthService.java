@@ -14,14 +14,12 @@ public class AuthService {
     private final UserDAO userDAO = new UserDAO();
     private final SecurityQuestionDAO securityQuestionDAO = new SecurityQuestionDAO();
 
-    // Register
     public boolean register(String name, String email, String password) {
         String hashedPassword = EncryptionUtil.hashSHA256(password);
         User user = new User(name, email, hashedPassword);
         return userDAO.registerUser(user);
     }
 
-    // Login
     public User login(String email, String password) {
         Optional<User> optionalUser = userDAO.findByEmail(email);
 
@@ -42,7 +40,6 @@ public class AuthService {
         return null;
     }
 
-    // Reset Password using Security Questions
     public boolean resetPassword(String email, List<String> answers, String newPassword) {
         Optional<User> optionalUser = userDAO.findByEmail(email);
 

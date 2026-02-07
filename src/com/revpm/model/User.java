@@ -14,17 +14,14 @@ public class User {
     private Date updatedAt;
     private Date lastLogin;
 
-    // Default Constructor
     public User() {}
 
-    // Constructor for Registration
     public User(String username, String email, String masterPassword) {
         this.username = username;
         this.email = email;
         this.masterPassword = masterPassword;
     }
 
-    // Full Constructor
     public User(long userId, String username, String email, String masterPassword,
                 int failedAttempts, boolean accountLocked,
                 Date createdAt, Date updatedAt, Date lastLogin) {
@@ -39,7 +36,6 @@ public class User {
         this.lastLogin = lastLogin;
     }
 
-    // Getters and Setters
 
     public long getUserId() {
         return userId;

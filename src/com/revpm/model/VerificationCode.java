@@ -51,7 +51,7 @@ public class VerificationCode {
         return "VerificationCode{" +
                 "codeId=" + codeId +
                 ", userId=" + userId +
-                ", code='[PROTECTED]'" + // FIXED: Do not print actual code
+                ", code='[PROTECTED]'" + 
                 ", expiryTime=" + expiryTime +
                 ", used=" + used +
                 '}';

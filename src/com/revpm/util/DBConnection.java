@@ -15,7 +15,6 @@ public class DBConnection {
     public static Connection getConnection() throws SQLException {
         try {
             Class.forName("oracle.jdbc.driver.OracleDriver");
-            // FIXED: Always return a new connection instance
             return DriverManager.getConnection(URL, USERNAME, PASSWORD);
         } catch (ClassNotFoundException e) {
             System.err.println("Oracle JDBC Driver not found!");

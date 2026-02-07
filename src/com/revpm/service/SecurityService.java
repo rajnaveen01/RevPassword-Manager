@@ -10,7 +10,6 @@ public class SecurityService {
     private final SecurityQuestionDAO securityQuestionDAO = new SecurityQuestionDAO();
 
     public boolean addQuestion(long userId, String question, String answer) {
-        // FIXED: Check if question already exists for this user
         List<SecurityQuestion> existing = securityQuestionDAO.getQuestionsByUser(userId);
         for (SecurityQuestion sq : existing) {
             if (sq.getQuestion().equalsIgnoreCase(question)) {
@@ -31,7 +30,6 @@ public class SecurityService {
         return securityQuestionDAO.deleteQuestion(questionId);
     }
 
-    // FIXED: Verify answers logic moved to Service. Returns true only if ALL match.
     public boolean verifySecurityAnswers(long userId, List<String> providedAnswers) {
         List<SecurityQuestion> storedQuestions = securityQuestionDAO.getQuestionsByUser(userId);
         if (storedQuestions.isEmpty() || storedQuestions.size() != providedAnswers.size()) {

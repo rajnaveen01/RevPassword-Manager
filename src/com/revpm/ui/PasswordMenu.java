@@ -9,9 +9,9 @@ import java.util.List;
 public class PasswordMenu {
 
     private PasswordService passwordService = new PasswordService();
-    private UserService userService = new UserService(); // Added to verify password
+    private UserService userService = new UserService();
     private long userId;
-    private String userEmail; // Needed for re-verification
+    private String userEmail;
 
     public PasswordMenu(long userId, String userEmail) {
         this.userId = userId;
@@ -20,17 +20,18 @@ public class PasswordMenu {
 
     public void start() {
         while (true) {
-            System.out.println("\n--- PASSWORD MENU ---");
-            System.out.println("1. Add Password");
-            System.out.println("2. List Passwords");
-            System.out.println("3. View Password (Secure)");
-            System.out.println("4. Update Password");
-            System.out.println("5. Delete Password");
-            System.out.println("6. Search Password");
-            System.out.println("7. Generate Strong Password");
-            System.out.println("0. Back");
+            System.out.println("\n================== VAULT OPERATIONS ==================");
+            System.out.println("   1. Add New Password");
+            System.out.println("   2. List All Passwords");
+            System.out.println("   3. View Password (Decrypt)");
+            System.out.println("   4. Update Password");
+            System.out.println("   5. Delete Password");
+            System.out.println("   6. Search Vault");
+            System.out.println("   7. Generate Strong Password");
+            System.out.println("   0. Return to Dashboard");
+            System.out.println("======================================================");
 
-            int choice = InputUtil.nextInt("Choose option: ");
+            int choice = InputUtil.nextInt(">> Select Option: ");
 
             switch (choice) {
                 case 1: addPassword(); break;
@@ -41,108 +42,109 @@ public class PasswordMenu {
                 case 6: searchPassword(); break;
                 case 7: generatePassword(); break;
                 case 0: return;
-                default: System.out.println("Invalid choice!");
+                default: System.out.println(">> [ERROR] Invalid choice.");
             }
         }
     }
 
     private void addPassword() {
-        String accountName = InputUtil.nextLine("Account Name: ");
-        String username = InputUtil.nextLine("Username: ");
+        System.out.println("\n-- Add New Entry --");
+        String accountName = InputUtil.nextLine(">> Account Name (e.g., Google): ");
+        String username = InputUtil.nextLine(">> Username/Login ID: ");
         
-        // FIXED: Enforce Strong Password
         String password;
         while(true) {
-            password = InputUtil.nextLine("Password: ");
+            password = InputUtil.nextLine(">> Password: ");
             if (com.revpm.util.ValidationUtil.isStrongPassword(password)) break;
-            System.out.println("Error: Password is too weak (needs 8+ chars, Upper, Lower, Digit, Special).");
+            System.out.println(">> [WARNING] Password is weak. We recommend stronger credentials.");
+            String confirm = InputUtil.nextLine(">> Use anyway? (Y/N): ");
+            if(confirm.equalsIgnoreCase("Y")) break;
         }
         
-        boolean success = passwordService.addPassword(userId, accountName, username, password);
-        // Error message is now handled nicely in DAO/Service if duplicate
-        if(success) System.out.println("Password added!");
+        if(passwordService.addPassword(userId, accountName, username, password)) {
+            System.out.println(">> [SUCCESS] Entry encrypted and saved to Vault.");
+        } else {
+            System.out.println(">> [ERROR] Failed to save. Account name might exist.");
+        }
     }
 
     private void listPasswords() {
         List<PasswordEntry> list = passwordService.listPasswords(userId);
-        System.out.printf("%-5s | %-20s | %-20s%n", "ID", "Account", "Username");
-        System.out.println("------------------------------------------------");
+        System.out.println("\n-------------------- STORED ACCOUNTS -----------------");
+        System.out.printf("| %-6s | %-20s | %-20s |%n", "ID", "ACCOUNT", "USERNAME");
+        System.out.println("+--------+----------------------+----------------------+");
         for (PasswordEntry p : list) {
-            System.out.printf("%-5d | %-20s | %-20s%n", p.getEntryId(), p.getAccountName(), p.getAccountUsername());
+            System.out.printf("| %-6d | %-20s | %-20s |%n", p.getEntryId(), p.getAccountName(), p.getAccountUsername());
         }
+        System.out.println("------------------------------------------------------");
     }
 
     private void viewPassword() {
-        String accountName = InputUtil.nextLine("Enter Account Name to View: ");
+        System.out.println("\n-- Decrypt Password --");
+        String accountName = InputUtil.nextLine(">> Enter Account Name: ");
         
-        // REQ: Master Password Re-entry
-        String masterPass = InputUtil.nextLine("Verify Master Password to reveal: ");
+        // Security Re-check
+        String masterPass = InputUtil.nextLine(">> Verify Master Password: ");
         if (userService.login(userEmail, masterPass) == -1) {
-            System.out.println("Authentication Failed! Access Denied.");
+            System.out.println(">> [SECURITY ALERT] Authentication Failed. Access Logged.");
             return;
         }
 
         String password = passwordService.viewPassword(userId, accountName);
         if (password != null) {
-            System.out.println("--------------------------------");
-            System.out.println("Decrypted Password: " + password);
-            System.out.println("--------------------------------");
+            System.out.println("\n   +------------------------------------------+");
+            System.out.println("   | DECRYPTED PASSWORD: " + password);
+            System.out.println("   +------------------------------------------+");
         } else {
-            System.out.println("Account not found.");
+            System.out.println(">> [ERROR] Account not found.");
         }
     }
 
     private void updatePassword() {
-        long entryId = InputUtil.nextLong("Entry ID: ");
+        long entryId = InputUtil.nextLong(">> Enter Entry ID to Update: ");
+        String newPassword = InputUtil.nextLine(">> Enter New Password: ");
         
-        // FIXED: Enforce Strong Password
-        String newPassword;
-        while(true) {
-            newPassword = InputUtil.nextLine("New Password: ");
-            if (com.revpm.util.ValidationUtil.isStrongPassword(newPassword)) break;
-            System.out.println("Error: Password is too weak (needs 8+ chars, Upper, Lower, Digit, Special).");
+        if (passwordService.updatePassword(entryId, newPassword)) {
+            System.out.println(">> [SUCCESS] Vault entry updated.");
+        } else {
+            System.out.println(">> [ERROR] Update failed. ID may be invalid.");
         }
-
-        boolean success = passwordService.updatePassword(entryId, newPassword);
-        System.out.println(success ? "Updated!" : "Failed!");
     }
 
     private void deletePassword() {
-        long entryId = InputUtil.nextLong("Entry ID: ");
-        boolean success = passwordService.deletePassword(entryId);
-        System.out.println(success ? "Deleted!" : "Failed!");
+        long entryId = InputUtil.nextLong(">> Enter Entry ID to Delete: ");
+        if (passwordService.deletePassword(entryId)) {
+            System.out.println(">> [SUCCESS] Entry moved to Trash (Soft Deleted).");
+        } else {
+            System.out.println(">> [ERROR] Delete failed. ID not found.");
+        }
     }
 
     private void searchPassword() {
-        String keyword = InputUtil.nextLine("Keyword: ");
+        String keyword = InputUtil.nextLine(">> Enter Search Keyword: ");
         List<PasswordEntry> list = passwordService.searchPasswords(userId, keyword);
+        System.out.println("\n-- Search Results --");
         for (PasswordEntry p : list) {
-            System.out.println(p.getEntryId() + " | " + p.getAccountName());
+            System.out.println(">> Found: [ID: " + p.getEntryId() + "] " + p.getAccountName());
         }
     }
 
     private void generatePassword() {
-        System.out.println("\n--- GENERATE PASSWORD ---");
-        int length = InputUtil.nextInt("Length (min 8): ");
-        if(length < 8) {
-            System.out.println("Auto-correcting length to 8.");
-            length = 8;
-        }
+        System.out.println("\n-- Password Generator --");
+        int length = InputUtil.nextInt(">> Length (min 8): ");
+        if(length < 8) length = 8;
 
-        // REQ: Providing parameters like characters, numbers, etc.
-        boolean useUpper = InputUtil.nextLine("Include Uppercase? (Y/N): ").equalsIgnoreCase("Y");
-        boolean useLower = InputUtil.nextLine("Include Lowercase? (Y/N): ").equalsIgnoreCase("Y");
-        boolean useDigits = InputUtil.nextLine("Include Numbers? (Y/N): ").equalsIgnoreCase("Y");
-        boolean useSpecial = InputUtil.nextLine("Include Special Chars? (Y/N): ").equalsIgnoreCase("Y");
+        boolean useUpper = InputUtil.nextLine(">> Include Uppercase? (Y/N): ").equalsIgnoreCase("Y");
+        boolean useLower = InputUtil.nextLine(">> Include Lowercase? (Y/N): ").equalsIgnoreCase("Y");
+        boolean useDigits = InputUtil.nextLine(">> Include Numbers? (Y/N): ").equalsIgnoreCase("Y");
+        boolean useSpecial = InputUtil.nextLine(">> Include Symbols? (Y/N): ").equalsIgnoreCase("Y");
 
         if (!useUpper && !useLower && !useDigits && !useSpecial) {
-            System.out.println("Invalid: You must select at least one option!");
+            System.out.println(">> [ERROR] Select at least one character type.");
             return;
         }
 
         String pwd = passwordService.generateCustomPassword(length, useUpper, useLower, useDigits, useSpecial);
-        System.out.println("--------------------------------");
-        System.out.println("Generated: " + pwd);
-        System.out.println("--------------------------------");
+        System.out.println("\n   GENERATED:  " + pwd);
     }
 }

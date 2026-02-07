@@ -9,7 +9,6 @@ import java.util.List;
 
 public class SecurityQuestionDAO {
 
-    // Add Security Question
     public boolean addQuestion(SecurityQuestion sq) {
         String sql = "INSERT INTO SECURITY_QUESTIONS(question_id, user_id, question, answer) " +
                      "VALUES(seq_question_id.NEXTVAL, ?, ?, ?)";
@@ -29,7 +28,6 @@ public class SecurityQuestionDAO {
         return false;
     }
 
-    // Get All Questions of User
     public List<SecurityQuestion> getQuestionsByUser(long userId) {
         List<SecurityQuestion> list = new ArrayList<>();
         String sql = "SELECT * FROM SECURITY_QUESTIONS WHERE user_id = ?";

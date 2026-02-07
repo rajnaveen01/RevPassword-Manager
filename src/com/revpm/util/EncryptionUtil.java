@@ -8,14 +8,13 @@ import java.util.Base64;
 
 public class EncryptionUtil {
 
-    // FIXED: Ensure key is exactly 16 bytes for AES-128
     private static final String SECRET_KEY_STRING = "RevPMSecretKey12"; 
     private static SecretKeySpec secretKey;
 
     static {
         try {
             byte[] key = SECRET_KEY_STRING.getBytes("UTF-8");
-            key = Arrays.copyOf(key, 16); // Force 128-bit key length
+            key = Arrays.copyOf(key, 16); 
             secretKey = new SecretKeySpec(key, "AES");
         } catch (Exception e) {
             e.printStackTrace();
@@ -52,7 +51,6 @@ public class EncryptionUtil {
             cipher.init(Cipher.DECRYPT_MODE, secretKey);
             return new String(cipher.doFinal(Base64.getDecoder().decode(encryptedData)));
         } catch (Exception e) {
-            // Return empty or error string if decryption fails (e.g., bad data)
             return "Decryption Failed"; 
         }
     }

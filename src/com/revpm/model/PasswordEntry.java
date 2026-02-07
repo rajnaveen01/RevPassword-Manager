@@ -13,10 +13,8 @@ public class PasswordEntry {
     private Date createdAt;
     private Date updatedAt;
 
-    // Default Constructor
     public PasswordEntry() {}
 
-    // Constructor for Adding New Password
     public PasswordEntry(long userId, String accountName, String accountUsername, String accountPassword) {
         this.userId = userId;
         this.accountName = accountName;
@@ -24,7 +22,6 @@ public class PasswordEntry {
         this.accountPassword = accountPassword;
     }
 
-    // Full Constructor
     public PasswordEntry(long entryId, long userId, String accountName, String accountUsername,
                          String accountPassword, boolean deleted, Date createdAt, Date updatedAt) {
         this.entryId = entryId;
@@ -36,8 +33,6 @@ public class PasswordEntry {
         this.createdAt = createdAt;
         this.updatedAt = updatedAt;
     }
-
-    // Getters and Setters
 
     public long getEntryId() {
         return entryId;

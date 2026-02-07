@@ -34,20 +34,35 @@ The project is built using a **Modular Layered Architecture** (UI, Service, DAO,
 
 ## 🏗️ System Architecture
 
-The application follows a strict separation of concerns:
+The application follows a layered architecture to ensure separation of concerns, scalability, and maintainability.
 
-1.  **Presentation Layer (`com.revpm.ui`):** Handles user input/output via the Console. Uses `InputUtil` for crash-proof data entry.
-2.  **Business Logic Layer (`com.revpm.service`):** Orchestrates data flow, validates inputs (Email/Password strength), and handles Encryption/Hashing logic.
-3.  **Data Access Layer (`com.revpm.dao`):** Executes optimized SQL queries and manages Database transactions.
-4.  **Utility Layer (`com.revpm.util`):** Cross-cutting concerns like Database Connection Pooling, Validation Regex, and Cryptographic helpers.
+### 📌 Architecture Diagram
 
-## 💾 Database Schema (ER Diagram Overview)
+![System Architecture Diagram](diagrams/Architecture.png)
 
-The system uses a relational schema with **One-to-Many** relationships:
-* **Users:** Stores user profile and Master Password Hash.
-* **Password_Entries:** Stores encrypted account credentials.
-* **Security_Questions:** Stores hashed answers for recovery.
-* **Verification_Codes:** Stores temporary OTPs for sensitive actions.
+**Layer Responsibilities:**
+- **UI Layer (`com.revpm.ui`)** – Handles user interaction via console menus.
+- **Service Layer (`com.revpm.service`)** – Implements business logic, validation, and security workflows.
+- **DAO Layer (`com.revpm.dao`)** – Handles database operations using JDBC.
+- **Utility Layer (`com.revpm.util`)** – Provides encryption, hashing, validation, and database connectivity utilities.
+- **Database Layer** – Oracle DB for persistent storage.
+
+---
+
+## 💾 Database Schema (ER Diagram)
+
+The system uses a relational database design with well-defined relationships between entities.
+
+### 🗄️ Entity Relationship Diagram (ERD)
+
+![ER Diagram](diagrams/ERDiagram.png)
+
+**Entity Overview:**
+- **User** – Stores user profile and master password hash.
+- **PasswordEntry** – Stores encrypted account credentials.
+- **SecurityQuestion** – Stores hashed recovery answers.
+- **VerificationCode** – Stores OTP codes with expiry.
+
 
 ## ⚙️ Setup & Installation
 

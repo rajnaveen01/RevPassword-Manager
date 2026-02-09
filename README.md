@@ -30,7 +30,7 @@ The project is built using a **Modular Layered Architecture** (UI, Service, DAO,
     * `javax.crypto` (AES Encryption)
     * `java.security` (SHA-256 Hashing, SecureRandom)
 * **Architecture:** Layered Architecture (Presentation -> Service -> DAO -> Database)
-* **Tools:** Maven, JUnit (Testing), Log4j (Logging)
+* **Tools:** JUnit (Testing), Log4j (Logging)
 
 ## 🏗️ System Architecture
 
@@ -74,8 +74,7 @@ The system uses a relational database design with well-defined relationships bet
     * Ensure Oracle Database is running.
     * Update `src/com/revpm/util/DBConnection.java` with your DB credentials (URL, Username, Password).
 3.  **Build the Project:**
-    * If using Maven: `mvn clean install`
-    * Or import into Eclipse/IntelliJ as a Java Project.
+    * import into Eclipse as a Java Project.
 4.  **Run:**
     * Execute the `MainApp.java` file in the `com.revpm.ui` package.
 

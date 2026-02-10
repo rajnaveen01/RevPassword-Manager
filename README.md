@@ -38,7 +38,7 @@ The application follows a layered architecture to ensure separation of concerns,
 
 ### 📌 Architecture Diagram
 
-![System Architecture Diagram]()
+![System Architecture Diagram](diagrams/Architecture.png)
 
 **Layer Responsibilities:**
 - **UI Layer (`com.revpm.ui`)** – Handles user interaction via console menus.
@@ -55,7 +55,7 @@ The system uses a relational database design with well-defined relationships bet
 
 ### 🗄️ Entity Relationship Diagram (ERD)
 
-![ER Diagram]()
+![ER Diagram](diagrams/ERDiagram.png)
 
 **Entity Overview:**
 - **User** – Stores user profile and master password hash.

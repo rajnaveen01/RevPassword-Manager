@@ -86,5 +86,3 @@ The system uses a relational database design with well-defined relationships bet
 4.  **Generate:** Create a secure password for a new service.
 5.  **View:** Select "Facebook", re-enter Master Password, and view the decrypted credential.
 
----
-*Developed by NaveenRaj as a Portfolio Project showcasing Secure Software Development and Java Full Stack capabilities.*
